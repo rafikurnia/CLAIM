@@ -1,0 +1,176 @@
+# openapi2-functions.yaml
+swagger: '2.0'
+info:
+  title: measurement-platform
+  description: A measurement platform built on top of serverless computing
+  version: 1.0.0
+  contact:
+    name: Rafi Kurnia Putra
+schemes:
+  - https
+definitions:
+  tasks.TaskInput:
+    properties:
+      arguments:
+        type: string
+      probe:
+        type: string
+      schedule:
+        $ref: '#/definitions/tasks.Schedule'
+      vantagePoints:
+        items:
+          type: string
+        type: array
+    type: object
+  tasks.Schedule:
+    properties:
+      cronExpression:
+        type: string
+      startTime:
+        type: string
+      stopTime:
+        type: string
+    type: object
+  utils.HTTPResponse:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+basePath: /api/v1
+paths:
+  /measurements:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Each field is required, otherwise it will be set as an empty string.
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/tasks.TaskInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: the ID of the task
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "400":
+          description: the error message and status code
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "500":
+          description: the error message and status code
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+      summary: Create a measurement task
+      tags:
+      - Measurements
+      operationId: createTask
+      x-google-backend:
+        address: https://europe-west1-omega-moonlight-291117.cloudfunctions.net/measurement-create-task
+        path_translation: APPEND_PATH_TO_ADDRESS
+        deadline: 300
+  /measurements/{id}:
+    get:
+      parameters:
+      - description: The ID of the task
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: the status of the task
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+      summary: Returns a status of a task with the specified ID
+      tags:
+      - Measurements
+      operationId: getTaskStatus
+      x-google-backend:
+        address: https://europe-west1-omega-moonlight-291117.cloudfunctions.net/measurement-get-status
+        path_translation: APPEND_PATH_TO_ADDRESS
+        deadline: 300
+    delete:
+      parameters:
+      - description: The ID of the task
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+      summary: Cancel a task with the specified ID
+      tags:
+      - Measurements
+      operationId: cancelTask
+      x-google-backend:
+        address: https://europe-west1-omega-moonlight-291117.cloudfunctions.net/measurement-cancel-task
+        path_translation: APPEND_PATH_TO_ADDRESS
+        deadline: 300
+  /measurements/{id}/results:
+    get:
+      parameters:
+      - description: The ID of the task
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: the results of the task
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "202":
+          description: the results are not ready
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.HTTPResponse'
+      summary: Returns a results of a task with the specified ID
+      tags:
+      - Measurements
+      operationId: getTaskResults
+      x-google-backend:
+        address: https://europe-west1-omega-moonlight-291117.cloudfunctions.net/measurement-get-results
+        path_translation: APPEND_PATH_TO_ADDRESS
+        deadline: 300

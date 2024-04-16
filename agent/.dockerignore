@@ -1,0 +1,10 @@
+*/temp*
+*/*/temp*
+temp/
+*/tmp*
+*/*/tmp*
+tmp/
+
+.dockerignore
+docker-compose.yml
+Dockerfile

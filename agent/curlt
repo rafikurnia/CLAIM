@@ -1,0 +1,15 @@
+#!/bin/sh
+
+set -e
+
+# source: https://curl.se/docs/manpage.html
+# time_namelookup    : The time, in seconds, it took from the start until the name resolving was completed.
+# time_connect       : The time, in seconds, it took from the start until the TCP connect to the remote host (or proxy) was completed.
+# time_appconnect    : The time, in seconds, it took from the start until the SSL/SSH/etc connect/handshake to the remote host was completed.
+# time_pretransfer   : The time, in seconds, it took from the start until the file transfer was just about to begin.
+# time_redirect      : The time, in seconds, it took for all redirection steps including name lookup, connect, pretransfer and transfer before the final transaction was started.
+# time_starttransfer : The time, in seconds, it took from the start until the first byte was just about to be transferred.
+# time_total         : The total time, in seconds, that the full operation lasted.
+curl_format='{"time_namelookup": %{time_namelookup}, "time_connect": %{time_connect}, "time_appconnect": %{time_appconnect}, "time_pretransfer": %{time_pretransfer}, "time_redirect": %{time_redirect}, "time_starttransfer": %{time_starttransfer}, "time_total": %{time_total}}\n'
+
+exec curl -w "$curl_format" -o /dev/null -s "$@"
